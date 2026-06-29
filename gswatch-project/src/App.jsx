@@ -401,7 +401,7 @@ function Dashboard({ T, submissions, onGoToForm }) {
             <KpiCard T={T} label="Workforce Score" value={agg.avgWF.toFixed(1)} unit="/ 5" color={T.red} sub="avg across centers"/>
           </div>
 
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:18}}>
+          <div className="gsw-grid-2" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:18}}>
             <SC T={T}>
               <SecTitle T={T} sub="Theme 1">Supply Shortage Frequency</SecTitle>
               <ResponsiveContainer width="100%" height={170}>
@@ -431,7 +431,7 @@ function Dashboard({ T, submissions, onGoToForm }) {
             </SC>
           </div>
 
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:18}}>
+          <div className="gsw-grid-2" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:18}}>
             <SC T={T}>
               <SecTitle T={T} sub="Composite">System Readiness Radar</SecTitle>
               <ResponsiveContainer width="100%" height={210}>
@@ -782,109 +782,6 @@ function QuestionnaireForm({ T, onSubmit }) {
   );
 }
 
-// ─── AI Analyst ────────────────────────────────────────────────────────────
-function AIAnalyst({ T, submissions }) {
-  const [query, setQuery] = useState("");
-  const [response, setResponse] = useState("");
-  const [loading, setLoading] = useState(false);
-  const n = submissions.length;
-  const agg = aggregate(submissions);
-
-  const systemPrompt = `You are the GSAI Intelligence Analyst for InciSioN GS Watch, a longitudinal global surgery surveillance initiative. 
-You have deep expertise in global surgery, health systems strengthening, and surgical equity policy.
-${n === 0 
-  ? "No center submissions have been received yet. Answer questions about global surgery, InciSioN's mission, and the GS Watch framework using your expert knowledge."
-  : `You have access to ${n} real verified reports from centers in: ${[...new Set(submissions.map(s=>s.country))].join(", ")}.
-Key data summary: ${JSON.stringify(agg)}.
-Ground your analysis in both the submitted data and your broader global surgery expertise.`}
-Keep responses concise (under 220 words), evidence-based, and actionable.`;
-
-  const presets = [
-    "What are the most critical global surgery priorities based on the data?",
-    "Which regions need most urgent AI triage deployment?",
-    "What should Phase III advocacy focus on?",
-    "Explain what the Bellwether procedures are and why they matter",
-    "How does GS Watch fit into the Lancet Commission framework?",
-  ];
-
-  const ask = async () => {
-    if (!query.trim()) return;
-    setLoading(true); setResponse("");
-    try {
-      const res = await fetch("https://api.anthropic.com/v1/messages", {
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify({
-          model:"claude-sonnet-4-6", max_tokens:1000,
-          system: systemPrompt,
-          messages:[{role:"user",content:query}]
-        })
-      });
-      const data = await res.json();
-      setResponse(data.content?.[0]?.text || "No response received.");
-    } catch { setResponse("Connection error. Please retry."); }
-    setLoading(false);
-  };
-
-  return (
-    <div style={{display:"flex",flexDirection:"column",gap:18}}>
-      <SC T={T}>
-        <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
-          <div style={{width:7,height:7,borderRadius:"50%",background:T.green,
-            boxShadow:`0 0 8px ${T.green}`}}/>
-          <span style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:14,fontWeight:700,color:T.text}}>
-            GSAI Intelligence Analyst
-          </span>
-          <span style={{fontSize:10,color:T.muted,marginLeft:"auto"}}>
-            Always active · {n > 0 ? `${n} real submissions` : "General expertise mode"}
-          </span>
-        </div>
-        <div style={{background:T.tealGlow,border:`1px solid ${T.teal}`,borderRadius:7,
-          padding:"9px 13px",marginBottom:14,fontSize:11,color:T.textSub,lineHeight:1.6}}>
-          {n === 0
-            ? "No submissions yet — operating in general global surgery expertise mode. Ask anything about surgical systems, InciSioN, the Lancet Commission, or GS Watch methodology."
-            : `Grounded in ${n} real GS Watch submission${n!==1?"s":""} plus global surgery expertise. Ask for data-driven intelligence or policy analysis.`
-          }
-        </div>
-        <div style={{display:"flex",flexWrap:"wrap",gap:7,marginBottom:14}}>
-          {presets.map(p=>(
-            <button key={p} onClick={()=>setQuery(p)} style={{
-              fontSize:11,padding:"5px 10px",borderRadius:20,
-              border:`1px solid ${T.border}`,background:"transparent",
-              color:T.textSub,cursor:"pointer"}}>
-              {p}
-            </button>
-          ))}
-        </div>
-        <div style={{display:"flex",gap:10}}>
-          <input value={query} onChange={e=>setQuery(e.target.value)}
-            onKeyDown={e=>e.key==="Enter"&&ask()}
-            placeholder="Ask the GSAI analyst..."
-            style={{flex:1,padding:"10px 14px",borderRadius:6,
-              background:T.bg,border:`1px solid ${T.border}`,
-              color:T.text,fontSize:13,outline:"none"}}/>
-          <button onClick={ask} disabled={loading}
-            style={{padding:"10px 16px",borderRadius:6,border:"none",
-              background:T.teal,color:"#fff",fontWeight:700,
-              cursor:loading?"wait":"pointer",fontSize:13,minWidth:80}}>
-            {loading?"…":"Analyze"}
-          </button>
-        </div>
-      </SC>
-
-      {(loading||response) && (
-        <SC T={T}>
-          <div style={{fontSize:10,color:T.teal,marginBottom:8,letterSpacing:"0.08em"}}>INTELLIGENCE REPORT</div>
-          {loading
-            ? <div style={{color:T.muted,fontSize:13}}>Analyzing…</div>
-            : <div style={{fontSize:13,color:T.textSub,lineHeight:1.75,whiteSpace:"pre-wrap"}}>{response}</div>
-          }
-        </SC>
-      )}
-    </div>
-  );
-}
-
 // ─── Project Concept ───────────────────────────────────────────────────────
 function ProjectConcept({ T }) {
   const phases = [
@@ -946,7 +843,7 @@ function ProjectConcept({ T }) {
       </div>
 
       {/* Two Arms */}
-      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:18}}>
+      <div className="gsw-grid-2" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:18}}>
         {arms.map(arm=>(
           <SC key={arm.title} T={T}>
             <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:14}}>
@@ -1000,7 +897,7 @@ function ProjectConcept({ T }) {
       {/* Principles */}
       <SC T={T}>
         <SecTitle T={T} sub="Design Principles">What Makes GS Watch Different</SecTitle>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
+        <div className="gsw-grid-2" style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:14}}>
           {principles.map(p=>(
             <div key={p.label} style={{padding:"14px 16px",borderRadius:8,
               border:`1px solid ${T.border}`,background:T.tealGlow}}>
@@ -1022,7 +919,7 @@ function ProjectConcept({ T }) {
           This process ensures that the world's first student-led longitudinal global surgery surveillance dataset 
           remains free from fabrication, duplication, and reporting error.
         </div>
-        <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,marginBottom:16}}>
+        <div className="gsw-grid-3" style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:12,marginBottom:16}}>
           {[
             {tag:"01",color:"#7B68EE",title:"Duplicate Detection",desc:"Submissions from the same center, email, or NWG within the same surveillance window are flagged and cross-referenced before inclusion."},
             {tag:"02",color:"#E05C5C",title:"Fraudulent Data Removal",desc:"Responses that fail plausibility checks, contain conflicting data patterns, or cannot be verified against institutional affiliation are excluded and logged."},
@@ -1130,10 +1027,10 @@ function AdminModal({ T, onSuccess, onClose }) {
     else { setErr(true); setPw(""); setTimeout(()=>setErr(false),2000); }
   };
   return (
-    <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.65)",zIndex:999,
+    <div className="gsw-modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.65)",zIndex:999,
       display:"flex",alignItems:"center",justifyContent:"center"}}>
-      <div style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:12,
-        padding:32,width:360,boxShadow:"0 8px 40px rgba(0,0,0,0.4)"}}>
+      <div className="gsw-modal-panel" style={{background:T.card,border:`1px solid ${T.border}`,borderRadius:12,
+        padding:32,width:360,maxWidth:"100%",boxSizing:"border-box",boxShadow:"0 8px 40px rgba(0,0,0,0.4)"}}>
         <div style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:17,fontWeight:700,
           color:T.text,marginBottom:6}}>Admin Access</div>
         <div style={{fontSize:12,color:T.muted,marginBottom:20}}>
@@ -1207,7 +1104,7 @@ function ControlRoom({ T, submissions, onDownloadExcel, onDownloadPDF, onRemove 
   return (
     <div style={{display:"flex",flexDirection:"column",gap:18}}>
       {/* Header bar */}
-      <div style={{background:`linear-gradient(135deg,rgba(224,92,92,0.15),transparent)`,
+      <div className="gsw-cr-header" style={{background:`linear-gradient(135deg,rgba(224,92,92,0.15),transparent)`,
         border:`1px solid #E05C5C`,borderRadius:10,padding:"14px 18px",
         display:"flex",alignItems:"center",gap:10}}>
         <span style={{width:20,height:20,borderRadius:4,background:"rgba(224,92,92,0.2)",
@@ -1222,17 +1119,17 @@ function ControlRoom({ T, submissions, onDownloadExcel, onDownloadPDF, onRemove 
             Full access to all raw submission data · {submissions.length} records · Restricted — Authorised Personnel Only
           </div>
         </div>
-        <div style={{marginLeft:"auto",display:"flex",gap:10}}>
+        <div className="gsw-cr-actions" style={{marginLeft:"auto",display:"flex",gap:10}}>
           <button onClick={onDownloadExcel}
             style={{padding:"8px 16px",background:"#1D9A50",color:"#fff",border:"none",
               borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:12,display:"flex",
-              alignItems:"center",gap:6}}>
+              alignItems:"center",gap:6,whiteSpace:"nowrap"}}>
             ↓ Excel (.xlsx)
           </button>
           <button onClick={onDownloadPDF}
             style={{padding:"8px 16px",background:"#E05C5C",color:"#fff",border:"none",
               borderRadius:6,fontWeight:700,cursor:"pointer",fontSize:12,display:"flex",
-              alignItems:"center",gap:6}}>
+              alignItems:"center",gap:6,whiteSpace:"nowrap"}}>
             ↓ PDF Report
           </button>
         </div>
@@ -1337,10 +1234,10 @@ function ControlRoom({ T, submissions, onDownloadExcel, onDownloadPDF, onRemove 
       {confirmIdx !== null && (() => {
         const s = submissions[confirmIdx];
         return (
-          <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.7)",zIndex:999,
+          <div className="gsw-modal-overlay" style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.7)",zIndex:999,
             display:"flex",alignItems:"center",justifyContent:"center"}}>
-            <div style={{background:T.card,border:`1px solid #E05C5C`,borderRadius:12,
-              padding:28,width:420,boxShadow:"0 8px 40px rgba(0,0,0,0.5)"}}>
+            <div className="gsw-modal-panel" style={{background:T.card,border:`1px solid #E05C5C`,borderRadius:12,
+              padding:28,width:420,maxWidth:"100%",boxSizing:"border-box",boxShadow:"0 8px 40px rgba(0,0,0,0.5)"}}>
               <div style={{width:40,height:40,borderRadius:8,background:"rgba(224,92,92,0.12)",
                 border:"1px solid #E05C5C",display:"flex",alignItems:"center",justifyContent:"center",
                 fontFamily:"'JetBrains Mono',monospace",fontSize:14,fontWeight:700,
@@ -1537,7 +1434,6 @@ ${submissions.map((s,i)=>`<tr>
     {id:"yearly",      label:"Year Analysis",   icon:"◈"},
     {id:"form",        label:"Submit Report",   icon:"◈"},
     {id:"concept",     label:"About Project",   icon:"◈"},
-    {id:"ai",          label:"AI Analyst",      icon:"◈"},
     {id:"controlroom", label:"Control Room",    icon:"◈", adminOnly:true},
   ];
 
@@ -1549,13 +1445,12 @@ ${submissions.map((s,i)=>`<tr>
       transition:"background 0.3s,color 0.3s"}}>
 
       {/* Header */}
-      <header style={{background:T.headerBg,borderBottom:`1px solid ${T.border}`,
-        padding:"0 22px",display:"flex",alignItems:"center",gap:14,
-        height:56,flexShrink:0,boxShadow:T.shadow,position:"sticky",top:0,zIndex:100}}>
+      <header className="gsw-header" style={{background:T.headerBg,borderBottom:`1px solid ${T.border}`,
+        boxShadow:T.shadow,position:"sticky",top:0,zIndex:100}}>
 
-        <div style={{display:"flex",alignItems:"center",gap:10}}>
+        <div className="gsw-brand">
           {/* InciSioN Official Logo SVG */}
-          <svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style={{flexShrink:0}}>
+          <svg className="gsw-brand-logo" width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg" style={{flexShrink:0}}>
             {/* Background circle */}
             <circle cx="22" cy="22" r="21" fill={dark?"#0d2236":"#ffffff"} stroke={T.teal} strokeWidth="1.5"/>
             {/* Scalpel blade — the iconic InciSioN "I" mark */}
@@ -1574,18 +1469,18 @@ ${submissions.map((s,i)=>`<tr>
             <rect x="9" y="21" width="7" height="2" rx="1" fill={T.amber} opacity="0.85"/>
             <rect x="11.5" y="18.5" width="2" height="7" rx="1" fill={T.amber} opacity="0.85"/>
           </svg>
-          <div>
+          <div className="gsw-brand-text">
             <div style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:15,fontWeight:800,
-              color:T.text,lineHeight:1.1,letterSpacing:"-0.3px"}}>
+              color:T.text,lineHeight:1.1,letterSpacing:"-0.3px",whiteSpace:"nowrap"}}>
               InciSioN <span style={{color:T.teal}}>GS Watch</span>
             </div>
-            <div style={{fontSize:9,color:T.muted,letterSpacing:"0.07em"}}>
+            <div className="gsw-brand-sub" style={{fontSize:9,color:T.muted,letterSpacing:"0.07em",whiteSpace:"nowrap"}}>
               GLOBAL SURGERY INTELLIGENCE PLATFORM
             </div>
           </div>
         </div>
 
-        <nav style={{display:"flex",gap:3,marginLeft:"auto"}}>
+        <nav className="gsw-nav">
           {navItems.map(n=>(
             <button key={n.id} onClick={()=>{
               if (n.adminOnly && !isAdmin) { setShowAdminModal(true); }
@@ -1596,7 +1491,8 @@ ${submissions.map((s,i)=>`<tr>
               border:`1px solid ${tab===n.id?T.teal:n.adminOnly&&!isAdmin?"#E05C5C44":"transparent"}`,
               color:tab===n.id?T.teal:n.adminOnly&&!isAdmin?"#E05C5C":T.muted,
               cursor:"pointer",fontSize:11,fontWeight:tab===n.id?700:400,
-              display:"flex",alignItems:"center",gap:5,transition:"all 0.18s"}}>
+              display:"flex",alignItems:"center",gap:5,transition:"all 0.18s",
+              flexShrink:0,whiteSpace:"nowrap"}}>
               {n.icon} {n.label}
               {n.adminOnly && isAdmin && <span style={{fontSize:8,background:"#E05C5C",color:"#fff",
                 padding:"1px 5px",borderRadius:8,fontWeight:700}}>ADMIN</span>}
@@ -1604,47 +1500,28 @@ ${submissions.map((s,i)=>`<tr>
           ))}
         </nav>
 
-        {/* Year badge + theme toggle */}
-        <div style={{display:"flex",alignItems:"center",gap:8}}>
-          <div style={{fontFamily:"'JetBrains Mono',monospace",fontSize:10,
-            color:T.teal,background:T.tealGlow,padding:"4px 10px",
-            borderRadius:20,border:`1px solid ${T.teal}`}}>
-            {currentYear}
-          </div>
-
+        {/* Theme toggle */}
+        <div className="gsw-header-right" style={{display:"flex",alignItems:"center",gap:8}}>
           <button onClick={()=>setDark(d=>!d)} title="Toggle light/dark mode"
             style={{width:34,height:20,borderRadius:10,
               background:dark?T.teal:T.border,border:"none",
-              cursor:"pointer",position:"relative",transition:"background 0.25s",padding:0}}>
+              cursor:"pointer",position:"relative",transition:"background 0.25s",padding:0,flexShrink:0}}>
             <div style={{width:14,height:14,borderRadius:"50%",background:"#fff",
               position:"absolute",top:3,
               left:dark?17:3,transition:"left 0.25s",
               boxShadow:"0 1px 3px rgba(0,0,0,0.3)"}}/>
           </button>
-          <span style={{fontSize:10,color:T.muted}}>{dark?"Dark":"Light"}</span>
-
-          <div style={{display:"flex",alignItems:"center",gap:5,
-            padding:"4px 10px",borderRadius:20,
-            border:`1px solid ${submissions.length>0?T.green:T.border}`,
-            background:submissions.length>0?"rgba(61,220,132,0.08)":"transparent"}}>
-            <div style={{width:5,height:5,borderRadius:"50%",
-              background:submissions.length>0?T.green:T.muted}}/>
-            <span style={{fontSize:9,color:submissions.length>0?T.green:T.muted,
-              fontFamily:"'JetBrains Mono',monospace"}}>
-              {submissions.length>0?`${submissions.length} LIVE REPORTS`:"AWAITING DATA"}
-            </span>
-          </div>
+          <span style={{fontSize:10,color:T.muted,whiteSpace:"nowrap"}}>{dark?"Dark":"Light"}</span>
         </div>
       </header>
 
       {/* Sub-header */}
-      <div style={{background:T.bgMid,borderBottom:`1px solid ${T.border}`,padding:"10px 22px"}}>
+      <div className="gsw-subheader" style={{background:T.bgMid,borderBottom:`1px solid ${T.border}`,padding:"10px 22px"}}>
         <div style={{fontFamily:"'Space Grotesk',sans-serif",fontSize:16,fontWeight:700,color:T.text}}>
           {tab==="dashboard"  && "Surveillance Dashboard"}
           {tab==="yearly"     && "Year-by-Year Analysis"}
           {tab==="form"       && `Submit Report — ${currentYear}`}
           {tab==="concept"    && "About Project"}
-          {tab==="ai"         && "AI Intelligence Analyst"}
           {tab==="controlroom"&& "Admin Control Room"}
         </div>
         <div style={{fontSize:11,color:T.muted,marginTop:2}}>
@@ -1652,7 +1529,6 @@ ${submissions.map((s,i)=>`<tr>
           {tab==="yearly"     && "Longitudinal surveillance trends · Designed to accumulate year over year"}
           {tab==="form"       && "Select from 80+ InciSioN member countries · Contributors receive formal acknowledgement in all publications"}
           {tab==="concept"    && "GS Watch methodology, framework, and recognition policy"}
-          {tab==="ai"         && "Always active · Combines global surgery expertise with your submitted dataset"}
           {tab==="controlroom"&& "Authorised access only · Full raw dataset · Download as Excel or PDF"}
         </div>
       </div>
@@ -1665,7 +1541,7 @@ ${submissions.map((s,i)=>`<tr>
       )}
 
       {/* Main Content */}
-      <main style={{flex:1,padding:"22px",
+      <main className="gsw-main" style={{flex:1,padding:"22px",
         maxWidth:tab==="form"||tab==="concept"?680:tab==="controlroom"?1200:1020,
         width:"100%",boxSizing:"border-box",margin:"0 auto"}}>
         {!loaded ? (
@@ -1697,8 +1573,6 @@ ${submissions.map((s,i)=>`<tr>
             </div>
             <QuestionnaireForm T={T} onSubmit={handleSubmit}/>
           </>
-        ) : tab==="concept" ? (
-          <ProjectConcept T={T}/>
         ) : tab==="controlroom" ? (
           isAdmin ? (
             <ControlRoom T={T} submissions={submissions}
@@ -1719,19 +1593,19 @@ ${submissions.map((s,i)=>`<tr>
             </div>
           )
         ) : (
-          <AIAnalyst T={T} submissions={submissions}/>
+          <ProjectConcept T={T}/>
         )}
       </main>
 
       {/* Footer */}
-      <footer style={{borderTop:`1px solid ${T.border}`,padding:"10px 22px",
+      <footer className="gsw-footer" style={{borderTop:`1px solid ${T.border}`,padding:"10px 22px",
         display:"flex",justifyContent:"space-between",alignItems:"center",
         background:T.bgMid,fontSize:10,color:T.muted}}>
         <div>
           <span style={{color:T.teal,fontWeight:600}}>InciSioN GS Watch</span>
           {" · "}International Student Surgical Network
         </div>
-        <div style={{display:"flex",alignItems:"center",gap:12}}>
+        <div style={{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}}>
           <span style={{fontFamily:"'JetBrains Mono',monospace",color:T.tealDim}}>
             GSAI v3.0 · LIVE DATA ONLY
           </span>
@@ -1742,11 +1616,54 @@ ${submissions.map((s,i)=>`<tr>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;700&display=swap');
         * { box-sizing: border-box; }
+        html, body { overflow-x: hidden; }
         ::-webkit-scrollbar { width: 5px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(0,175,190,0.3); border-radius: 3px; }
         input::placeholder, textarea::placeholder { opacity: 0.5; }
         button:focus { outline: none; }
+
+        /* ── Header layout ── */
+        .gsw-header {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          padding: 0 22px;
+          min-height: 56px;
+          flex-shrink: 0;
+        }
+        .gsw-brand { display: flex; align-items: center; gap: 10px; min-width: 0; flex-shrink: 0; }
+        .gsw-nav { display: flex; gap: 3px; margin-left: auto; overflow-x: auto; scrollbar-width: none; }
+        .gsw-nav::-webkit-scrollbar { display: none; }
+        .gsw-header-right { flex-shrink: 0; }
+
+        /* ── Responsive grids (desktop default set inline; collapse below) ── */
+        .gsw-grid-2, .gsw-grid-3 { min-width: 0; }
+
+        @media (max-width: 860px) {
+          .gsw-header { padding: 10px 16px; flex-wrap: wrap; height: auto; row-gap: 8px; }
+          .gsw-brand-sub { display: none; }
+          .gsw-nav { order: 3; width: 100%; margin-left: 0; padding-bottom: 2px; }
+          .gsw-header-right { order: 2; margin-left: auto; }
+
+          .gsw-subheader { padding: 10px 16px; }
+          .gsw-main { padding: 16px !important; }
+          .gsw-footer { flex-direction: column; align-items: flex-start; gap: 6px; padding: 12px 16px; }
+
+          .gsw-grid-2, .gsw-grid-3 { grid-template-columns: 1fr !important; }
+          .gsw-cr-header { flex-wrap: wrap; }
+          .gsw-cr-actions { margin-left: 0 !important; width: 100%; }
+          .gsw-cr-actions button { flex: 1; }
+
+          .gsw-modal-panel { width: 100% !important; max-width: 360px; padding: 22px !important; }
+        }
+
+        @media (max-width: 480px) {
+          .gsw-brand-logo { width: 36px; height: 36px; }
+          .gsw-nav button { padding: 5px 9px !important; font-size: 10px !important; }
+          .gsw-modal-overlay { padding: 16px; }
+          .gsw-modal-panel { padding: 18px !important; }
+        }
       `}</style>
     </div>
   );
