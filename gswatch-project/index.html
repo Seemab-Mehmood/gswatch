@@ -8,6 +8,49 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
   </head>
   <body>
+    <!-- START OF GSI DEVELOPER PREVIEW BANNER -->
+<div id="developer-preview-banner" style="
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: linear-gradient(90deg, #e67e22 0%, #d35400 100%);
+    color: #ffffff;
+    text-align: center;
+    padding: 10px 20px;
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    z-index: 999999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    box-sizing: border-box;
+">
+    <span style="
+        background-color: rgba(255, 255, 255, 0.25);
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        text-transform: uppercase;
+    ">Developer Preview</span>
+    <span>This platform is a structural mockup for administrative review. It is not actively collecting or storing data.</span>
+</div>
+
+<!-- Page Layout Adjustment Script -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        var banner = document.getElementById("developer-preview-banner");
+        if (banner) {
+            // Dynamically pushes the body down by the exact height of the banner
+            document.body.style.paddingTop = banner.offsetHeight + "px";
+        }
+    });
+</script>
+<!-- END OF GSI DEVELOPER PREVIEW BANNER -->
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
